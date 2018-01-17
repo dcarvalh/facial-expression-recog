@@ -13,7 +13,7 @@ def process_file(img_path):
 def generate_tuples(path):
 	#while 1:
 	# Get the list of all classes (= list of folder in the dataset path)
-	classes = [d for d in os.listdir(path) is os.path.isdir(os.path.join(path, d))]
+	classes = [dr for dr in os.listdir(path) if os.path.isdir(os.path.join(path, dr))]
 	# For each class...
 	for emotion in classes:
 		path_e = os.path.join(path, emotion)
