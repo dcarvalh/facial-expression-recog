@@ -8,16 +8,17 @@ class ResNet:
 		# create the base pre-trained model
 		self.base_model = ResNet50(weights='imagenet', include_top=False)
 
+		# TODO Understand why those lines !
 		# add a global spatial average pooling layer
 		layer = self.base_model.output
 		layer = GlobalAveragePooling2D()(layer)
 		# Add a fully-connected layer
 		layer = Dense(1024, activation='relu')(layer)
 		# and a logistic layer for our classes
-		prediction = Dense(number_classes, activation='softmax')(layer)
+		predict= Dense(number_classes, activation='softmax')(layer)
 
 		# this is the model we will train
-		self.model = Model(inputs=self.base_model.input, outputs=prediction)
+		self.model = Model(inputs=self.base_model.input, outputs=predict)
 
 
 	##### First training
@@ -34,8 +35,10 @@ class ResNet:
 				metrics=['accuracy'])
 
 			
-		# TODO  samples_per_e = size(training set)/batch_size
-		self.model.fit_generator(train_gen, steps_per_epoch=1, epochs=1,
+		# TODO proper init for : validation_step, epochs
+		self.model.fit_generator(train_gen, 
+			steps_per_epoch=len(train_gen.classes)/train_gen.batch_size,
+			epochs=1,
 			validation_data = validation_gen) 
 
 
@@ -44,11 +47,10 @@ class ResNet:
 	# convolutional layers from Resnet. Freeze the bottom N layers
 	# and train the remaining top layers.
 	def fine_tune(self, train_gen, validation_gen):
-		# we chose to train the top 2 resnet blocks, i.e. we will freeze
-		# the first 249 layers and unfreeze the rest:
+		# Chose to train the top 2 resnet blocks, 
+		# i.e., freeze the first 249 layers and unfreeze the rest:
 		for layer in self.model.layers[:170]:
 			layer.trainable = False
-
 		for layer in self.model.layers[170:]:
 			layer.trainable = True
 
