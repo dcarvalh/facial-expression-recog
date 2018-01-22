@@ -1,11 +1,7 @@
 from keras.applications.resnet50 import ResNet50
-from keras.preprocessing import image
-from keras.applications.resnet50 import preprocess_input, decode_predictions
 from keras.optimizers import SGD
 from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
-from keras import backend as K
-import numpy as np
 
 class ResNet:
 	def __init__(self, number_classes):
