@@ -1,6 +1,5 @@
 from keras.applications.resnet50 import ResNet50
 from keras.preprocessing import image
-from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.resnet50 import preprocess_input, decode_predictions
 from keras.optimizers import SGD
 from keras.models import Model
@@ -24,32 +23,10 @@ class ResNet:
 		# this is the model we will train
 		self.model = Model(inputs=self.base_model.input, outputs=prediction)
 
-		#### Set data generator for our datasets
-		# Set the data generator for our training dataset
-		# Also set modifiers for data augmentation (shear and zoom)
-		train_datagen = ImageDataGenerator(
-			rescale=1./255,
-			shear_range=0.2)
-		self.train_generator = train_datagen.flow_from_directory('./train',
-			target_size = (224, 224),
-			batch_size = 32)
-
-		# Set the data generator for the validation dataset
-		validation_datagen = ImageDataGenerator(rescale = 1./255)
-		self.validation_generator = validation_datagen.flow_from_directory(
-			'./validation',
-			target_size = (224, 224),
-			batch_size = 32)
-
-		# Set the data generator for the testing dataset
-		test_datagen = ImageDataGenerator(rescale = 1./255)
-		self.test_generator = test_datagen.flow_from_directory('./test',
-			target_size = (224, 224),
-			batch_size = 32)
 
 	##### First training
 	## Do a first training of the model on the new data for a few epoch
-	def first_train(self):
+	def first_train(self, train_gen, validation_gen):
 		# first: train only the top layers, which were randomly initialized
 		# i.e. freeze all convolutional ResNet layers
 		for layer in self.base_model.layers:
@@ -62,15 +39,15 @@ class ResNet:
 
 			
 		# TODO  samples_per_e = size(training set)/batch_size
-		self.model.fit_generator(self.train_generator, steps_per_epoch=1, epochs=1,
-			validation_data = self.validation_generator) 
+		self.model.fit_generator(train_gen, steps_per_epoch=1, epochs=1,
+			validation_data = validation_gen) 
 
 
 	##### Fine tuning
 	# Here, the top layers are trained and we can start fine-tuning
 	# convolutional layers from Resnet. Freeze the bottom N layers
 	# and train the remaining top layers.
-	def fine_tune(self):
+	def fine_tune(self, train_gen, validation_gen):
 		# we chose to train the top 2 resnet blocks, i.e. we will freeze
 		# the first 249 layers and unfreeze the rest:
 		for layer in self.model.layers[:170]:
@@ -87,12 +64,12 @@ class ResNet:
 
 		# Train model again (this time fine-tuning the top 2 resnet blocks)
 		# alongside the top Dense layers
-		self.model.fit_generator(self.train_generator, 
+		self.model.fit_generator(train_gen, 
 			steps_per_epoch=1, epochs=1,
-			validation_data = self.validation_generator)
+			validation_data = validation_gen)
 
 	# Evaluates our classifier on the testing set and print accuracy and loss
-	def evaluate(self):
+	def evaluate(self, test_gen):
 		print(self.model.metrics_names)
 		# TODO also call predict_generator to get the list of results
-		print(self.model.evaluate_generator(self.test_generator))
+		print(self.model.evaluate_generator(test_gen))
