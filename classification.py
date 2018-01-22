@@ -1,4 +1,3 @@
-# CAREFUL : not real finished working code. Just some quick writing in order to get familiar with Keras structure
 from keras.applications.resnet50 import ResNet50
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
@@ -63,7 +62,6 @@ validation_generator = validation_datagen.flow_from_directory('./validation',
 	batch_size = 32)
 	
 # TODO  samples_per_e = size(training set)/batch_size
-# TODO also call validation generator
 print("First training...")
 model.fit_generator(train_generator, steps_per_epoch=1, epochs=1,
 	validation_data = validation_generator) 
@@ -95,7 +93,8 @@ model.fit_generator(train_generator, steps_per_epoch=1,
 		validation_data = validation_generator)
 
 
-########## Test the classifier
+##### Test the classifier
+
 # Set the data generator for the testing dataset
 test_datagen = ImageDataGenerator(rescale = 1./255)
 test_generator = test_datagen.flow_from_directory('./test',
@@ -103,7 +102,7 @@ test_generator = test_datagen.flow_from_directory('./test',
 	batch_size = 32)
 # Evaluates our model on the testing set and print accuracy and loss
 print(model.metrics_names)
-model.evaluate_generator(test_generator)
+print(model.evaluate_generator(test_generator))
 
 # TODO also call predict_generator to get the list of results
 
