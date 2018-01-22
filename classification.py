@@ -1,6 +1,7 @@
 # CAREFUL : not real finished working code. Just some quick writing in order to get familiar with Keras structure
 from keras.applications.resnet50 import ResNet50
 from keras.preprocessing import image
+from keras.preprocessing.image import ImageDataGenerator
 from keras.applications.resnet50 import preprocess_input, decode_predictions
 from keras.optimizers import SGD
 from keras.models import Model
@@ -30,6 +31,7 @@ predictions = Dense(number_classes, activation='softmax')(x)
 # this is the model we will train
 model = Model(inputs=base_model.input, outputs=predictions)
 
+
 ##### First training
 
 # first: train only the top layers (which were randomly initialized)
@@ -43,10 +45,17 @@ model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 # train the model on the new data for a few epochs
 # fit_generator(self, generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None, validation_steps=None, class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=False, shuffle=True, initial_epoch=0)
 # TODO adapt generate_tuples to our case
-generator = generate_tuples('./train')
+
+train_datagen = ImageDataGenerator(
+	rescale=1./255,
+	shear_range=0.2,
+	zoom_range=0.2)	
+train_generator = train_datagen.flow_from_directory('./train',
+	target_size = (224, 224),
+	batch_size = 32)
 
 # TODO  samples_per_e = size(training set)/batch_size
-model.fit_generator(generator, steps_per_epoch=10) #, epoch = 4)
+model.fit_generator(train_generator, steps_per_epoch=4) #, epoch = 4)
 
 ##### Fine tuning
 
