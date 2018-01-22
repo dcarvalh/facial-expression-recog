@@ -55,18 +55,14 @@ train_generator = train_datagen.flow_from_directory('./train',
 	batch_size = 32)
 
 # TODO  samples_per_e = size(training set)/batch_size
-model.fit_generator(train_generator, steps_per_epoch=4) #, epoch = 4)
+# TODO also call validation generator
+model.fit_generator(train_generator, steps_per_epoch=1) #, epoch = 4)
 
 ##### Fine tuning
 
 # at this point, the top layers are well trained and we can start fine-tuning
 # convolutional layers from Resnet. We will freeze the bottom N layers
 # and train the remaining top layers.
-
-# let's visualize layer names and layer indices to see how many layers
-# we should freeze:
-for i, layer in enumerate(base_model.layers):
-   print(i, layer.name)
 
 # we chose to train the top 2 resnet blocks, i.e. we will freeze
 # the first 249 layers and unfreeze the rest:
