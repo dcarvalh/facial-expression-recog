@@ -5,7 +5,7 @@ from DSHandler import DSHandler
 number_classes = 7
 
 ##### Model definition
-dsHandler = DSHandler()
+dsHandler = DSHandler((197,197))
 classifier = ResNet(number_classes)
 
 print("First training...")
