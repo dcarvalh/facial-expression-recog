@@ -40,23 +40,33 @@ for layer in base_model.layers:
     layer.trainable = False
 
 # compile the model (do it *after* setting layers to non-trainable)
-model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy', 
+		metrics=['accuracy'])
 
-# train the model on the new data for a few epochs
-# fit_generator(self, generator, steps_per_epoch=None, epochs=1, verbose=1, callbacks=None, validation_data=None, validation_steps=None, class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=False, shuffle=True, initial_epoch=0)
-# TODO adapt generate_tuples to our case
 
+
+####  Do a first training of the model on the new data for a few epochs
+
+# Set the data generator for our training dataset
+# Also set modifiers for data augmentation (shear and zoom)
 train_datagen = ImageDataGenerator(
 	rescale=1./255,
-	shear_range=0.2,
-	zoom_range=0.2)	
+	shear_range=0.2)
 train_generator = train_datagen.flow_from_directory('./train',
 	target_size = (224, 224),
 	batch_size = 32)
 
+# Set the data generator for the validation dataset
+validation_datagen = ImageDataGenerator(rescale = 1./255)
+validation_generator = validation_datagen.flow_from_directory('./validation',
+	target_size = (224, 224),
+	batch_size = 32)
+	
 # TODO  samples_per_e = size(training set)/batch_size
 # TODO also call validation generator
-model.fit_generator(train_generator, steps_per_epoch=1) #, epoch = 4)
+print("First training...")
+model.fit_generator(train_generator, steps_per_epoch=1, epochs=1,
+	validation_data = validation_generator) 
 
 ##### Fine tuning
 
@@ -74,28 +84,41 @@ for layer in model.layers[170:]:
 
 # we need to recompile the model for these modifications to take effect
 # we use SGD with a low learning rate
-model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy')
+model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), 
+	loss='categorical_crossentropy',
+	metrics=['accuracy'])
 
-# we train our model again (this time fine-tuning the top 2 inception blocks)
+# we train our model again (this time fine-tuning the top 2 resnet blocks)
 # alongside the top Dense layers
-model.fit_generator(generator, steps_per_epoch=10) #, epoch = 4)
+print("Fine tune the model...")
+model.fit_generator(train_generator, steps_per_epoch=1,
+		validation_data = validation_generator)
+
+
+
+
+
+
+
+
+
+
+
 
 
 ############ Use the basic model without finetuning it 
+def use_base_model(number_classes=7):
 # creates our CNN
-model = ResNet50(weights='imagenet', classes=number_classes)
+	model = ResNet50(weights='imagenet', classes=number_classes)
 
-img_path = 'elephant.jpg'
-img = image.load_img(img_path, target_size=(224, 224))
-x = image.img_to_array(img)
-x = np.expand_dims(x, axis=0)
-x = preprocess_input(x)
+	img_path = 'elephant.jpg'
+	img = image.load_img(img_path, target_size=(224, 224))
+	x = image.img_to_array(img)
+	x = np.expand_dims(x, axis=0)
+	x = preprocess_input(x)
 
-preds = model.predict(x)
-# decode the results into a list of tuples (class, description, probability)
-# (one such list for each sample in the batch)
-print('Predicted:', decode_predictions(preds, top=3)[0])
-# Predicted: [(u'n02504013', u'Indian_elephant', 0.82658225), (u'n01871265', u'tusker', 0.1122357), (u'n02504458', u'African_elephant', 0.061040461)]
-
-
-
+	preds = model.predict(x)
+	# decode the results into a list of tuples (class, description, probability)
+	# (one such list for each sample in the batch)
+	print('Predicted:', decode_predictions(preds, top=3)[0])
+	# Predicted: [(u'n02504013', u'Indian_elephant', 0.82658225), (u'n01871265', u'tusker', 0.1122357), (u'n02504458', u'African_elephant', 0.061040461)]
