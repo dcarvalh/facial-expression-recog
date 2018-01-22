@@ -95,7 +95,15 @@ model.fit_generator(train_generator, steps_per_epoch=1,
 		validation_data = validation_generator)
 
 
-
+########## Test the classifier
+# Set the data generator for the testing dataset
+test_datagen = ImageDataGenerator(rescale = 1./255)
+test_generator = test_datagen.flow_from_directory('./test',
+	target_size = (224, 224),
+	batch_size = 32)
+# Evaluates our model on the testing set and print accuracy and loss
+print(model.metrics_names);
+model.evaluate_generator(test_generator);
 
 
 
