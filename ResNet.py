@@ -8,7 +8,7 @@ class ResNet:
 		# create the base pre-trained model
 		self.base_model = ResNet50(weights='imagenet', include_top=False)
 
-		# TODO Understand why those lines !
+		# Build a classifier model to put on top
 		# add a global spatial average pooling layer
 		layer = self.base_model.output
 		layer = GlobalAveragePooling2D()(layer)
@@ -23,23 +23,25 @@ class ResNet:
 
 	##### First training
 	## Do a first training of the model on the new data for a few epoch
-	def first_train(self, train_gen, validation_gen):
-		# first: train only the top layers, which were randomly initialized
-		# i.e. freeze all convolutional ResNet layers
+	def first_train(self, train_gen, val_gen):
+		# first: train only new layers, which were randomly initialized
+		# i.e. freeze all other ResNet layers
 		for layer in self.base_model.layers:
 		    layer.trainable = False
 
-		# compile the model (do it *after* setting layers to non-trainable)
+		# compile the model
 		self.model.compile(optimizer='rmsprop', 
 				loss='categorical_crossentropy', 
 				metrics=['accuracy'])
 
 			
-		# TODO proper init for : validation_step, epochs
+		# TODO proper init for : epochs
+		# steps_per_epoch is number of samples divided by batch size
 		self.model.fit_generator(train_gen, 
-			steps_per_epoch=len(train_gen.classes)/train_gen.batch_size,
+			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
 			epochs=1,
-			validation_data = validation_gen) 
+			validation_data = val_gen,
+			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
 
 	##### Fine tuning
@@ -55,7 +57,7 @@ class ResNet:
 			layer.trainable = True
 
 		# Need to recompile the model for these changes to take effect
-		# we use SGD with a low learning rate
+		# As recommended, SGD is used with a low learning rate
 		self.model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), 
 			loss='categorical_crossentropy',
 			metrics=['accuracy'])

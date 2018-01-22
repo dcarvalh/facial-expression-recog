@@ -1,6 +1,7 @@
 from keras.preprocessing.image import ImageDataGenerator
 
 class DSHandler:
+	# TODO give arguments such as batch size & target_size
 	def __init__(self):
 		#### Set data generator for our datasets
 		# Set the data generator for our training dataset
