@@ -53,6 +53,8 @@ for e in expected:
 
 # Should be equal to the number of samples
 print(sum(cmc))
+# As the rank was inverse earlier, we need to reverse it again
+cmc = cmc[::-1]
 # change values of cmc to get only the probabilities
 cmc = [float(x) / 39. for x in cmc]
 # Should be (at least almost) equal to 1
