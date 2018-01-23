@@ -6,7 +6,7 @@ from DSHandler import DSHandler
 number_classes = 7
 
 ##### Model definition
-dsHandler = DSHandler((197,197))
+dsHandler = DSHandler((175,175))
 classifier = Inception(number_classes)
 
 # get generators for the training and validation set

@@ -40,7 +40,7 @@ class ResNet:
 		# steps_per_epoch is number of samples divided by batch size
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
-			epochs=3,
+			epochs=2,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
@@ -52,10 +52,11 @@ class ResNet:
 	# and train the remaining top layers.
 	def fine_tune(self, train_gen, val_gen):
 		# Chose to train the top 2 resnet blocks, 
-		# i.e., freeze the first 249 layers and unfreeze the rest:
-		for layer in self.model.layers[:170]:
+		# i.e., freeze the first 169 layers and unfreeze the rest:
+		# TODO the problem here is that too few layers are trainable
+		for layer in self.model.layers[:172]:
 			layer.trainable = False
-		for layer in self.model.layers[170:]:
+		for layer in self.model.layers[172:]:
 			layer.trainable = True
 
 		# Need to recompile the model for these changes to take effect
@@ -68,7 +69,7 @@ class ResNet:
 		# alongside the top Dense layers
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
-			epochs=3,
+			epochs=2,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
