@@ -1,12 +1,13 @@
 
 from ResNet import ResNet
+from Inception import Inception
 from DSHandler import DSHandler
 
 number_classes = 7
 
 ##### Model definition
 dsHandler = DSHandler((197,197))
-classifier = ResNet(number_classes)
+classifier = Inception(number_classes)
 
 # get generators for the training and validation set
 train_gen = dsHandler.get_train_generator('./train')
