@@ -1,15 +1,15 @@
-
-from ResNet import ResNet
+from Inception import Inception
 from DSHandler import DSHandler
-from keras.utils import plot_model
 from keras.models import load_model
 
 
 number_classes = 7
 
+
 ##### Model definition
-dsHandler = DSHandler((197,197))
-classifier = ResNet(number_classes)
+dsHandler = DSHandler((175,175))
+classifier = Inception(number_classes)
+
 
 
 classifier.model = load_model("MyModel.h5")
