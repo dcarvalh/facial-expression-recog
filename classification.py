@@ -20,21 +20,18 @@ print("Fine tune the model...")
 classifier.fine_tune(train_gen, val_gen)
 
 # get generators for the testing
-#print("Evaluates classifier on testing set...")
-#test_gen = dsHandler.get_generator('./test')
-#classifier.evaluate(test_gen)
+print("Evaluates classifier on testing set...")
+test_gen = dsHandler.get_generator('./test')
+classifier.evaluate(test_gen)
 
 my_model = classifier.model
 
 
 #plot_model(my_model, to_file='model.png')
 
+my_model.save("MyModel.h5")
 
-"""
-layers
-inputs
-outputs
-    
-"""
+
+
 
 
