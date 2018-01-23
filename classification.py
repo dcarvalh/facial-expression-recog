@@ -1,5 +1,3 @@
-
-from ResNet import ResNet
 from Inception import Inception
 from DSHandler import DSHandler
 from keras.utils import plot_model
