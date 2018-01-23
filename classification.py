@@ -6,17 +6,23 @@ from keras.utils import plot_model
 number_classes = 7
 
 ##### Model definition
-dsHandler = DSHandler()
+dsHandler = DSHandler((197,197))
 classifier = ResNet(number_classes)
 
+# get generators for the training and validation set
+train_gen = dsHandler.get_train_generator('./train')
+val_gen = dsHandler.get_generator('./validation')
+
 print("First training...")
-classifier.first_train(dsHandler.train_generator, dsHandler.validation_generator)
+classifier.first_train(train_gen, val_gen)
 
 print("Fine tune the model...")
-classifier.fine_tune(dsHandler.train_generator, dsHandler.validation_generator)
+classifier.fine_tune(train_gen, val_gen)
 
-print("Evaluates classifier on testing set...")
-classifier.evaluate(dsHandler.test_generator)
+# get generators for the testing
+#print("Evaluates classifier on testing set...")
+#test_gen = dsHandler.get_generator('./test')
+#classifier.evaluate(test_gen)
 
 my_model = classifier.model
 
