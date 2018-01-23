@@ -70,7 +70,6 @@ class ResNet:
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
 			epochs=1,
-			epochs=2,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
