@@ -19,4 +19,18 @@ print("Evaluates classifier on testing set...")
 test_gen = dsHandler.get_generator('./test')
 classifier.evaluate(test_gen)
 
+# Confusion matrix
+print("\nConfusion Matrix")
+print("\n#Labels#")
+classes_dict = test_gen.class_indices
+classes_view = [(v, k)for k, v in classes_dict.iteritems()]
+classes_view.sort() # natively sort tuples by first element
+for v, k in classes_view:
+    print "%d - %s" % (v, k)
+
+classifier.conf_matrix(test_gen)
+
+
+
+
 

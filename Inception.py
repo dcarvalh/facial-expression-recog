@@ -2,10 +2,11 @@ from keras.applications.inception_v3 import InceptionV3
 from keras.optimizers import SGD
 from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
+from sklearn.metrics import confusion_matrix
 
 class Inception:
 	def __init__(self, number_classes):
-		# create the base pre-trained model
+		# create th	e base pre-trained model
 		self.base_model = InceptionV3(weights='imagenet', include_top=False)
 
 		# Build a classifier model to put on top
@@ -28,7 +29,7 @@ class Inception:
 		# first: train only new layers, which were randomly initialized
 		# i.e. freeze all other ResNet layers
 		for layer in self.base_model.layers:
-		    layer.trainable = False
+			layer.trainable = False
 
 		# compile the model
 		self.model.compile(optimizer='rmsprop', 
@@ -40,7 +41,7 @@ class Inception:
 		# steps_per_epoch is number of samples divided by batch size
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
-			epochs=2,
+			epochs=3,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
@@ -69,7 +70,7 @@ class Inception:
 		# alongside the top Dense layers
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
-			epochs=2,
+			epochs=3,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
@@ -78,3 +79,21 @@ class Inception:
 		print(self.model.metrics_names)
 		# TODO also call predict_generator to get the list of results
 		print(self.model.evaluate_generator(test_gen))
+
+	def conf_matrix(self, test_gen):
+		# class output classification
+		correct_classif = test_gen.classes
+		output_classif = self.model.predict_generator(test_gen).argmax(axis=-1)
+		#print(correct_classif)
+		#print(output_classif)
+
+		conf_matrix = confusion_matrix(correct_classif, output_classif)
+
+		# Print the confusion matrix
+		print conf_matrix
+		"""i_vec = [0, 1, 2, 3, 4, 5, 6]
+		print i_vec
+		i = 0
+		for vec in conf_matrix:
+			print("{} {}".format(i, vec))
+			i = i + 1"""
