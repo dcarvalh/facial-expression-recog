@@ -1,13 +1,14 @@
 
 from ResNet import ResNet
+from Inception import Inception
 from DSHandler import DSHandler
 from keras.utils import plot_model
 
 number_classes = 7
 
 ##### Model definition
-dsHandler = DSHandler((197,197))
-classifier = ResNet(number_classes)
+dsHandler = DSHandler((175,175))
+classifier = Inception(number_classes)
 
 # get generators for the training and validation set
 train_gen = dsHandler.get_train_generator('./train')

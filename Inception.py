@@ -1,12 +1,12 @@
-from keras.applications.resnet50 import ResNet50
+from keras.applications.inception_v3 import InceptionV3
 from keras.optimizers import SGD
 from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
 
-class ResNet:
+class Inception:
 	def __init__(self, number_classes):
 		# create the base pre-trained model
-		self.base_model = ResNet50(weights='imagenet', include_top=False)
+		self.base_model = InceptionV3(weights='imagenet', include_top=False)
 
 		# Build a classifier model to put on top
 		# add a global spatial average pooling layer
@@ -40,7 +40,7 @@ class ResNet:
 		# steps_per_epoch is number of samples divided by batch size
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
-			epochs=1,
+			epochs=2,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
 
@@ -51,12 +51,12 @@ class ResNet:
 	# convolutional layers from Resnet. Freeze the bottom N layers
 	# and train the remaining top layers.
 	def fine_tune(self, train_gen, val_gen):
-		# Chose to train the top 2 resnet blocks, 
-		# i.e., freeze the first 169 layers and unfreeze the rest:
+		# Chose to train the top 2 inception blocks, 
+		# i.e., freeze the bottom N layers and unfreeze the rest:
 		# TODO the problem here is that too few layers are trainable
-		for layer in self.model.layers[:172]:
+		for layer in self.model.layers[:249]:
 			layer.trainable = False
-		for layer in self.model.layers[172:]:
+		for layer in self.model.layers[249:]:
 			layer.trainable = True
 
 		# Need to recompile the model for these changes to take effect
@@ -65,11 +65,10 @@ class ResNet:
 			loss='categorical_crossentropy',
 			metrics=['accuracy'])
 
-		# Train model again (this time fine-tuning the top 2 resnet blocks)
+		# Train model again (now fine-tuning the top 2 inception blocks)
 		# alongside the top Dense layers
 		self.model.fit_generator(train_gen, 
 			steps_per_epoch = len(train_gen.classes) // train_gen.batch_size,
-			epochs=1,
 			epochs=2,
 			validation_data = val_gen,
 			validation_steps = len(val_gen.classes) // val_gen.batch_size) 
