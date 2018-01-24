@@ -23,7 +23,6 @@ class Inception:
         self.model = Model(inputs=self.base_model.input, outputs=predict)
 
     ##### First training
-    # TODO this step should be much faster...
     ## Do a first training of the model on the new data for a few epoch
     def first_train(self, train_gen, val_gen):
         # first: train only new layers, which were randomly initialized
@@ -36,7 +35,6 @@ class Inception:
                            loss='categorical_crossentropy',
                            metrics=['accuracy'])
 
-        # TODO proper init for : epochs
         # steps_per_epoch is number of samples divided by batch size
         self.model.fit_generator(train_gen,
                                  steps_per_epoch=len(train_gen.classes) // train_gen.batch_size,
@@ -45,14 +43,12 @@ class Inception:
                                  validation_steps=len(val_gen.classes) // val_gen.batch_size)
 
     ##### Fine tuning
-    # TODO understand why val_acc doesn't change here
     # Here, the top layers are trained and we can start fine-tuning
     # convolutional layers from Resnet. Freeze the bottom N layers
     # and train the remaining top layers.
     def fine_tune(self, train_gen, val_gen):
         # Chose to train the top 2 inception blocks,
         # i.e., freeze the bottom N layers and unfreeze the rest:
-        # TODO the problem here is that too few layers are trainable
         for layer in self.model.layers[:249]:
             layer.trainable = False
         for layer in self.model.layers[249:]:
@@ -75,10 +71,7 @@ class Inception:
     # Evaluates our classifier on the testing set and print accuracy and loss
     def evaluate(self, test_gen):
         print(self.model.metrics_names)
-        # TODO also call predict_generator to get the list of results
         print(self.model.evaluate_generator(test_gen))
-
-        self.conf_matrix(test_gen)
 
 
     def conf_matrix(self, test_gen):
@@ -92,9 +85,3 @@ class Inception:
 
         # Print the confusion matrix
         print conf_matrix
-        """i_vec = [0, 1, 2, 3, 4, 5, 6]
-        print i_vec
-        i = 0
-        for vec in conf_matrix:
-            print("{} {}".format(i, vec))
-            i = i + 1"""

@@ -5,8 +5,9 @@ from keras.preprocessing import image
 from keras.applications.inception_v3 import preprocess_input, decode_predictions
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
-number_classes = 7
+number_classes = 4
 
 
 def test1image(model, img_path, dict_class):
@@ -25,7 +26,7 @@ dsHandler = DSHandler((175, 175))
 classifier = Inception(number_classes)
 
 # load our model
-classifier.model = load_model("MyModel.h5")
+classifier.model = load_model("MyModel_new_48.h5")
 
 # get generators for the testing
 print("Evaluates classifier on testing set...")
@@ -39,20 +40,21 @@ classes_dict = test_gen.class_indices
 classes_dict = {v: k for k, v in classes_dict.iteritems()}
 
 ### Try to classify one image
-test1image(classifier.model, "./test/surprise/surprise_15.jpg", classes_dict)
-
-#### Confusion matrix
-print("\nConfusion Matrix")
-print("\n#Labels#")
-# Build a list containing dictionary values sorted
-for index in classes_dict:
-    print "%d - %s" % (index, classes_dict[index])
-
-classifier.conf_matrix(test_gen)
+test1image(classifier.model, "./test/neutral/neutral_10.jpg", classes_dict)
 
 #### Build CMC Curve
 # gives results for each sample as a list of probability
 results = classifier.model.predict_generator(test_gen)
+
+correct_classif = test_gen.classes
+output_classif = results.argmax(axis=-1)
+conf_matrix = confusion_matrix(correct_classif, output_classif)
+
+print conf_matrix
+
+print(correct_classif)
+print(output_classif)
+
 
 i = 0
 # Build a new array containing only ranks
@@ -67,12 +69,12 @@ for r in results:
     i = i + 1
 
 i = 0
-cmc = [0, 0, 0, 0, 0, 0]
+cmc = number_classes * [0]
+
 
 # gives expected output for each sample
 expected = test_gen.classes
 # Get the rank of each element and sum it for our array
-# TODO find a simpler way to do it
 for e in expected:
     rank = int(results[i][e])
     cmc[rank] = cmc[rank] + 1
@@ -80,12 +82,10 @@ for e in expected:
 
 # As the rank was inverse earlier, we need to reverse it again
 cmc = cmc[::-1]
-print(sum(cmc))  # Should be equal to the number of samples
+tot = sum(cmc)  # Should be equal to the number of samples
 
 # change values of cmc to get only the probabilities
-cmc = [float(x) / 39. for x in cmc]
-
-print(sum(cmc))  # Should be (almost) equal to 1
+cmc = [float(x) / tot for x in cmc]
 
 # Computes the cumulative sum of those probabilities
 cmc = [sum(cmc[:i]) for i in range(1, len(cmc) + 1)]

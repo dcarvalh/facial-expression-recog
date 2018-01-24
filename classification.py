@@ -2,7 +2,7 @@ from Inception import Inception
 from DSHandler import DSHandler
 # from keras.utils import plot_model
 
-number_classes = 7
+number_classes = 4
 
 # Model definition
 dsHandler = DSHandler((175, 175))

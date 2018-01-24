@@ -1,9 +1,6 @@
 26 - neutral
-11 - anger
-14 - disgust
-7 - fear
+24 - anger
 16 - happy
-8 - sadness
 18 - surprise
 
-100 - TOTAL
+84 - TOTAL

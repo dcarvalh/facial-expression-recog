@@ -20,17 +20,6 @@ class DSHandler:
             image_directory,
             target_size=self.resize,
             batch_size=32)
-
-        #		img = load_img('./train/anger/anger_8.jpg')  # this is a PIL image
-        #		x = img_to_array(img)  # this is a Numpy array with shape (3, 150, 150)
-        #		x = x.reshape((1,) + x.shape)  # this is a Numpy array with shape (1, 3, 150, 150)
-        #
-        #		i = 0
-        #		for batch in train_datagen.flow(x, batch_size=1,
-        #				save_to_dir='preview', save_prefix='generated', save_format='jpeg'):
-        #			i += 1
-        #			if i > 20:
-        #				break  # otherwise the generator would loop indefinitely
         return train_generator
 
     # Set the data generator for validation and testing set
