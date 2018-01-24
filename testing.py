@@ -104,6 +104,7 @@ for thresh in frange(0, 1.0, 0.1):
 	i = i+1
 
 # Finally, we can prepare the plot for FAR and FRR
+plt.figure(1)
 xi = [tr for tr in frange(0, 1.0, 0.1)]
 far_plot = plt.plot(xi, far)
 frr_plot = plt.plot(xi, frr)
@@ -144,6 +145,7 @@ for e in correct_classif:
 
 # As the rank was inversed earlier, we need to reverse it again
 cmc = cmc[::-1]
+print(len(ranks))
 tot = sum(cmc)  # Should be equal to the number of samples
 
 # Change values of cmc to get only the probabilities
@@ -154,6 +156,6 @@ cmc = [sum(cmc[:i]) for i in range(1, len(cmc) + 1)]
 
 
 # Finally, we can plot our CMC
-xi = [tr for tr in frange(0, 1.0, 0.1)]
-plt.plot([x for x in range(1, 6)], cmc)
+plt.figure(2)
+plt.plot(cmc)
 plt.show()
