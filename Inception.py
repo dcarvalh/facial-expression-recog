@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 
 class Inception:
     def __init__(self, number_classes):
-        # create th	e base pre-trained model
+        # create the base pre-trained model
         self.base_model = InceptionV3(weights='imagenet', include_top=False)
 
         # Build a classifier model to put on top
@@ -74,13 +74,16 @@ class Inception:
         print(self.model.evaluate_generator(test_gen))
 
 
+    #### Generates the confusion matrix
     def conf_matrix(self, test_gen):
-        # class output classification
+        # expected output
         correct_classif = test_gen.classes
+	# our classifier output
         output_classif = self.model.predict_generator(test_gen).argmax(axis=-1)
         print(correct_classif)
         print(output_classif)
 
+	# computes the confusion matrix
         conf_matrix = confusion_matrix(correct_classif, output_classif)
 
         # Print the confusion matrix

@@ -23,7 +23,6 @@ class DSHandler:
         return train_generator
 
     # Set the data generator for validation and testing set
-    # Also set modifiers for data augmentation (shear and zoom)
     def get_generator(self, image_directory):
         datagen = ImageDataGenerator(rescale=self.rescale)
         generator = datagen.flow_from_directory(

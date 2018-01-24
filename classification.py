@@ -1,6 +1,5 @@
 from Inception import Inception
 from DSHandler import DSHandler
-# from keras.utils import plot_model
 
 number_classes = 4
 
@@ -22,6 +21,7 @@ classifier.fine_tune(train_gen, val_gen)
 print("Evaluates classifier on testing set...")
 test_gen = dsHandler.get_generator('./test')
 
+# TODO all this part (except save model) useful ?
 print("\nConfusion Matrix")
 print("\n#Labels#")
 classes_dict = test_gen.class_indices
@@ -37,5 +37,6 @@ my_model = classifier.model
 
 # plot_model(my_model, to_file='model.png')
 
+# Save model learned in a file to get statistics on this model
 my_model.save("MyModel_b1.h5")
 
