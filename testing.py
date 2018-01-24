@@ -4,13 +4,13 @@ from keras.models import load_model
 import numpy as np
 import matplotlib.pyplot as plt
 
-number_classes = 6
+number_classes = 4
 
 # Model definition
 dsHandler = DSHandler((175, 175))
 classifier = Inception(number_classes)
 
-classifier.model = load_model("MyModel.h5")
+classifier.model = load_model("MyModel_a0.h5")
 
 # get generators for the testing
 print("Evaluates classifier on testing set...")
