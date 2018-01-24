@@ -1,31 +1,52 @@
 from Inception import Inception
 from DSHandler import DSHandler
 from keras.models import load_model
+from keras.preprocessing import image
+from keras.applications.inception_v3 import preprocess_input, decode_predictions
 import numpy as np
 import matplotlib.pyplot as plt
 
-number_classes = 4
+def test1image(model, img_path, dict_class):
+	img = image.load_img(img_path, target_size=(175, 175))
+	x = image.img_to_array(img)
+	x = np.expand_dims(x, axis=0)
+	x = preprocess_input(x)
+	preds = model.predict(x)
+	# decode the results into a list of tuples (class, description, probability
+	# (one such list for each sample in the batch)
+	print('Predicted : ', dict_class[preds.argmax()], 'with confidence of ', preds.max())
+
+
+number_classes = 6
 
 # Model definition
 dsHandler = DSHandler((175, 175))
 classifier = Inception(number_classes)
 
-classifier.model = load_model("MyModel_a0.h5")
+# load our model
+classifier.model = load_model("MyModel.h5")
 
 # get generators for the testing
 print("Evaluates classifier on testing set...")
 test_gen = dsHandler.get_generator('./test')
 classifier.evaluate(test_gen)
 
-# Confusion matrix
+# Get dictionary of class label-indices (will be very useful later)
+classes_dict = test_gen.class_indices
+# The dictionary found is not suitable. 
+# We want it to be indexed by index and not class label so it's reversed
+classes_dict = {v: k for k, v in classes_dict.iteritems()}
+
+### Try to classify one image
+test1image(classifier.model, "./test/surprise/surprise_15.jpg", classes_dict)
+
+
+#### Confusion matrix
 print("\nConfusion Matrix")
 print("\n#Labels#")
-# Get dictionary of class label-indices
-classes_dict = test_gen.class_indices
 # Build a list containing dictionary values sorted
-sorted_classes = sorted(classes_dict.items(), key=operator.itemgetter(1))
-for clas, val in sorted_classes:
-    print "%d - %s" % (val, clas)
+for index in classes_dict:
+    print "%d - %s" % (index, classes_dict[index])
 
 classifier.conf_matrix(test_gen)
 
@@ -73,4 +94,3 @@ cmc = [sum(cmc[:i]) for i in range(1, len(cmc)+1)]
 # Finally, we can plot our CMC
 plt.plot(cmc)
 plt.show()
-
