@@ -40,7 +40,7 @@ class Inception:
         # steps_per_epoch is number of samples divided by batch size
         self.model.fit_generator(train_gen,
                                  steps_per_epoch=len(train_gen.classes) // train_gen.batch_size,
-                                 epochs=3,
+                                 epochs=20,
                                  validation_data=val_gen,
                                  validation_steps=len(val_gen.classes) // val_gen.batch_size)
 
@@ -78,12 +78,15 @@ class Inception:
         # TODO also call predict_generator to get the list of results
         print(self.model.evaluate_generator(test_gen))
 
+        self.conf_matrix(test_gen)
+
+
     def conf_matrix(self, test_gen):
         # class output classification
         correct_classif = test_gen.classes
         output_classif = self.model.predict_generator(test_gen).argmax(axis=-1)
-        # print(correct_classif)
-        # print(output_classif)
+        print(correct_classif)
+        print(output_classif)
 
         conf_matrix = confusion_matrix(correct_classif, output_classif)
 
