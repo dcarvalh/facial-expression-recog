@@ -20,15 +20,16 @@ classifier.evaluate(test_gen)
 # Confusion matrix
 print("\nConfusion Matrix")
 print("\n#Labels#")
+# Get dictionary of class label-indices
 classes_dict = test_gen.class_indices
-classes_view = [(v, k)for k, v in classes_dict.iteritems()]
-classes_view.sort()  # natively sort tuples by first element
-for v, k in classes_view:
-    print "%d - %s" % (v, k)
+# Build a list containing dictionary values sorted
+sorted_classes = sorted(classes_dict.items(), key=operator.itemgetter(1))
+for clas, val in sorted_classes:
+    print "%d - %s" % (val, clas)
 
 classifier.conf_matrix(test_gen)
 
-#### CMC
+#### Build CMC Curve
 # gives results for each sample as a list of probability
 results = classifier.model.predict_generator(test_gen)
 
@@ -64,7 +65,7 @@ print(sum(cmc)) # Should be equal to the number of samples
 # change values of cmc to get only the probabilities
 cmc = [float(x) / 39. for x in cmc]
 
-print(sum(cmc)) # Should be (at least almost) equal to 1
+print(sum(cmc)) # Should be (almost) equal to 1
 
 # Computes the cumulative sum of those probabilities
 cmc = [sum(cmc[:i]) for i in range(1, len(cmc)+1)]
