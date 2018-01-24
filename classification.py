@@ -2,7 +2,7 @@ from Inception import Inception
 from DSHandler import DSHandler
 # from keras.utils import plot_model
 
-number_classes = 4
+number_classes = 7
 
 # Model definition
 dsHandler = DSHandler((175, 175))
@@ -37,5 +37,5 @@ my_model = classifier.model
 
 # plot_model(my_model, to_file='model.png')
 
-my_model.save("MyModel_a1.h5")
+my_model.save("MyModel_b1.h5")
 

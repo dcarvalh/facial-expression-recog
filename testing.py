@@ -4,7 +4,7 @@ from keras.models import load_model
 import numpy as np
 import matplotlib.pyplot as plt
 
-number_classes = 4
+number_classes = 7
 
 # Model definition
 dsHandler = DSHandler((175, 175))

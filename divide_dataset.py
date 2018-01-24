@@ -8,6 +8,9 @@ VALID = "validation"
 TEST = "test"
 SETS = [TRAIN, VALID, TEST]
 
+PERC_TRAIN = 0.7
+PERC_VALID = 0.2 + PERC_VALID
+
 
 emotions = ["neutral", "anger", "disgust", "fear", "happy", "sadness", "surprise"]  # Define emotions
 
@@ -37,9 +40,9 @@ for emot in emotions:
 
     random.shuffle(images)
 
-    training = images[:int(len(images)*0.7)]
-    validation = images[int(len(images)*0.7):int(len(images)*0.9)]
-    testing = images[int(len(images)*0.9):]
+    training = images[:int(len(images)*PERC_TRAIN)]
+    validation = images[int(len(images)*PERC_TRAIN):int(len(images)*PERC_VALID)]
+    testing = images[int(len(images)*PERC_VALID):]
 
     for image in training:
         copyfile("{}{}{}{}{}".format(DATASET, os.sep, emot, os.sep, image),
