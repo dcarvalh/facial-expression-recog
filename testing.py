@@ -20,13 +20,19 @@ def test1image(model, img_path, dict_class):
     # (one such list for each sample in the batch)
     print('Predicted : ', dict_class[preds.argmax()], 'with confidence of ', preds.max())
 
+def frange(start, stop, step):
+	i = start
+	while i < stop:
+		yield i
+		i += step
+
 
 # Model definition
 dsHandler = DSHandler((175, 175))
 classifier = Inception(number_classes)
 
 # load our model
-classifier.model = load_model("MyModel_new_48.h5")
+classifier.model = load_model("Model_Exp3.h5")
 
 # get generators for the testing
 print("Evaluates classifier on testing set...")
@@ -42,12 +48,60 @@ classes_dict = {v: k for k, v in classes_dict.iteritems()}
 ### Try to classify one image
 test1image(classifier.model, "./test/neutral/neutral_10.jpg", classes_dict)
 
-#### Build CMC Curve
 # gives results for each sample as a list of probability
 results = classifier.model.predict_generator(test_gen)
 
+# gives expected output for each sample
 correct_classif = test_gen.classes
+
+# Gives the output of our classifier
 output_classif = results.argmax(axis=-1)
+
+# Gives the expected class for each sample
+correct_classif = test_gen.classes
+
+#### FAR/FRR Curve
+nea = 0
+nfr = 0
+nia = 0
+nfa = 0
+
+threshold = 0.4
+
+far = [0] * 11
+frr = [0] * 11
+i = 0
+for thresh in frange(0, 1.0, 0.1):
+	for r, e in zip(results, correct_classif):
+		# if the sample is well classified
+		if r.argmax() == e:
+			nea = nea + 1
+			# It its score was below our threshold
+			if r.max() < thresh: 
+				nfr = nfr +1
+		else : 
+			nia = nia +1
+			# It its score was greater than our threshold
+			if r.max() > thresh:
+				nfa = nfa+1
+	# Now that we have all values for this threshold, we can compute the 
+	# corresponding FAR and FRR
+	far[i] = float(nfa)/nia
+	frr[i] = float(nfr)/nea
+	# Resets values for the next threshold
+	nea = nia = nfa = nfr = 0
+	i = i+1
+print("nea = ", nea, " nfr = ", nfr, "nia = ", nia, " nfa = ", nfa)
+print("far = ", far, " frr=",frr)
+	
+# Finally, we can plot our CMC
+xi = [tr for tr in frange(0, 1.0, 0.1)]
+far_plot = plt.plot(xi, far)
+frr_plot = plt.plot(xi, frr)
+plt.show()
+
+
+#### Confusion Matrix
 conf_matrix = confusion_matrix(correct_classif, output_classif)
 
 print conf_matrix
@@ -56,6 +110,7 @@ print(correct_classif)
 print(output_classif)
 
 
+#### Build CMC Curve
 i = 0
 # Build a new array containing only ranks
 for r in results:
@@ -72,10 +127,8 @@ i = 0
 cmc = number_classes * [0]
 
 
-# gives expected output for each sample
-expected = test_gen.classes
 # Get the rank of each element and sum it for our array
-for e in expected:
+for e in correct_classif:
     rank = int(results[i][e])
     cmc[rank] = cmc[rank] + 1
     i = i + 1
